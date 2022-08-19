@@ -14,5 +14,5 @@ area: {type: String, required :true},
 population: {type: Number, required :true},
 })
 
-const Countries = mongoose.model('Countrie', CategorySchema )
-module.exports = Category
+const Countries = mongoose.model('Countrie', CountriesSchema )
+module.exports = Countries
