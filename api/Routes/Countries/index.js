@@ -6,9 +6,9 @@ const axios = require('axios')
 
 router.get('/getAllCountriesData', async (req, res) => {
     try {
-        let allCountriesRequest = await axios.get('https://restcountries.eu/rest/v3/all').then(e => e.data)
+        let allCountriesRequest = await axios.get('https://restcountries.eu/rest/v3/all').then(e => e.data).catch(e => console.error(e))
         allCountriesRequest?.map(e => {
-            Countries.create({
+           const response =  await Countries.create({
                 name: e.name.common,
                 nameId: e.cca3,
                 oficialName: e.name.official,
@@ -19,7 +19,7 @@ router.get('/getAllCountriesData', async (req, res) => {
                 subRegion: e.subregion[0],
                 area: e.area,
                 population: e.population,
-            })
+            }).then( e => console.log(response)).catch(e => console.error(e))
         }) 
         res.send({msg:'ok'})
     } catch (error) {
