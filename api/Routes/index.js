@@ -1,8 +1,8 @@
 const { Router } = require('express')
 const router = Router()
 
-const Countrie = require('./Routes/Countries/index.js')
+const Countrie = require('./Countries/index.js')
 
-router.use('countries', Countrie )
+router.use('/countries', Countrie )
 
 module.exports = router
