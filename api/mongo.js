@@ -10,3 +10,4 @@ const connectionString = `mongodb+srv://gatingatito:${password}@pi-mongo.casksvq
 mongoose.connect(connectionString)
 .then(() => console.log('database on'))
 .catch((err) => console.error(err))
+

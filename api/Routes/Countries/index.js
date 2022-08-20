@@ -6,27 +6,40 @@ const axios = require('axios')
 
 router.get('/getAllCountriesData', async (req, res) => {
     try {
-        let allCountriesRequest = await axios.get('https://restcountries.eu/rest/v3/all').then(e => e.data).catch(e => console.error(e))
-        allCountriesRequest?.map(async e => {
-           const response =  await Countries.create({
+        let allCountriesRequest = await axios.get('https://restcountries.com/v3/all').then(e => e.data).catch(e => console.log(e))
+        let response =  allCountriesRequest.map(e => {
+            return {
                 name: e.name.common,
                 nameId: e.cca3,
                 oficialName: e.name.official,
-                flagImg: e.flags[0],
-                continents: e.region[0],
-                capitalCity: e.capital[0],
+                flagImg: e.flags[0]? e.flags[0] : 'no flag',
+                continent: e.continents[0]? e.continents[0] : 'no continent',
+                // capitalCity: e.capital[0]? e.capital[0] : 'no capital',
                 region: e.region,
-                subRegion: e.subregion[0],
+                subRegion: e.subregion   ,
                 area: e.area,
                 population: e.population,
-            }).then( e => console.log(response)).catch(e => console.error(e))
-        }) 
-        res.send({msg:'ok'})
+            }
+        })
+        let realResponse = await response.map (async (e) => {
+            let newCountry = new Countries(e)
+            await newCountry.save().then(e => e).catch(e => console.log(e))
+        })
+  
+        return res.send({msg:response})
+    } catch (error) {
+        console.log({eror:error.message})
+    }
+})
+
+router.get('/', async (req, res) => {
+    try {
+        
+        res.send({msg:'ok2'})
     } catch (error) {
         console.log(error)
     }
 })
-
 module.exports = router
 
 
