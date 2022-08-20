@@ -1,13 +1,11 @@
+require('dotenv').config()
 const mongoose = require('mongoose')
-
-const password = 'fUAwA2iLQ4r3PoAz'
-const connectionString = `mongodb+srv://gatingatito:${password}@pi-mongo.casksvq.mongodb.net/?retryWrites=true&w=majority`
+console.log(process.env.MONGODB_URI)
 
 
-
-
-
-mongoose.connect(connectionString)
+mongoose.connect(process.env.MONGODB_URI, {useNewUrlParser: true,})
 .then(() => console.log('database on'))
 .catch((err) => console.error(err))
+
+module.exports = mongoose;
 

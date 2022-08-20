@@ -1,4 +1,4 @@
-const mongoose = require('mongoose')
+const mongoose = require('../mongo.js')
 const {Schema} = mongoose;
 
 const CountriesSchema = new Schema({
@@ -14,5 +14,5 @@ area: {type: String, required :false},
 population: {type: Number, required :false},
 })
 
-const Countries = mongoose.model('Countries', CountriesSchema )
-module.exports = Countries
+const Countrie = mongoose.model('Countrie', CountriesSchema )
+module.exports = Countrie
