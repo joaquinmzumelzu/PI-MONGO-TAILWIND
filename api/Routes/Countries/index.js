@@ -158,15 +158,21 @@ const axios = require('axios')
     //--------------------------------------------------------------------------------------------------------------------- 
     router.get('/', async (req, res) => {
         const {c} = req.query // c  ---> continents
-        const {sort} = req.query ; // sort  
-        const {search} = req.query; // search
+        const {sort} = req.query ; // sort --> sort by name AZ or ZA --> sort by population ASC or DESC 
+        const {search} = req.query; // search --> it filter the data by the name of the country
         const page = req.query.p || 0;
         const perPage = 20
         
+
+        //*******************************************************************************
+        //in here we declare the array of continents that we are going to use in the mongoose find query
         let cArray = []
         function getContinents(c){
+            //if there is only 1 continent on the query, we are going to push it on the array
             if(typeof c === 'string') cArray.push(c.toLowerCase())
+            // we are going to check if there is no query continent, if there is no query continent, we are going return nothing, so the array will still empty
             else if(typeof c === 'undefined') return
+            //if there is more than 1 continent on the query, we are going to push them on the array
             else {
                 c.forEach(e => {
                     cArray.push(e.toLowerCase())
@@ -175,17 +181,22 @@ const axios = require('axios')
         }
         
         getContinents(c)
+        //*******************************************************************************
 
-
+        // So, first we are going to check if there is a query continent 
         if(!c){
+            //if there is a query continent, we are going to return all the countries that match with the query, sorted and paginated.
             try {
+                // first of all we declare a the response variable and we initialize it with null
                 let response = null
-
+                //if there is no sort query || if sort query is nameDESC, we are going to return the data sorted and paginated 
                 if(!sort || sort == 'nameDESC'){
-                  if(!search) response = await Countrie.find({}).sort({name: 'asc'}).skip(page * perPage).limit(perPage)
-                  else response = await Countrie.find({name: {$regex: search, $options: 'i'}}).sort({name: 'asc'}).skip(page * perPage).limit(perPage)
+                    // if there is no search query, we are going to return the data sorted and paginated
+                    if(!search) response = await Countrie.find({}).sort({name: 'asc'}).skip(page * perPage).limit(perPage)
+                    // and if there are a search query, we are going to return the data that match with the search query, sorted and paginated
+                    else response = await Countrie.find({name: {$regex: search, $options: 'i'}}).sort({name: 'asc'}).skip(page * perPage).limit(perPage)
                 }  
-                
+                // the rest of the code bellow is the same as the previous one, but it response with the type of sort
                  
                 if(sort === 'nameASC'){
                     if(!search) response = await Countrie.find({}).sort({name: 'desc'}).skip(page * perPage).limit(perPage)
@@ -201,21 +212,29 @@ const axios = require('axios')
                     if(!search) response = await Countrie.find({}).sort({population: 'asc'}).skip(page * perPage).limit(perPage)
                     else response = await Countrie.find({name: {$regex: search, $options: 'i'}}).sort({population: 'asc'}).skip(page * perPage).limit(perPage)
                 }
-
+                
+                // when the filtering and query is done, we are going to return the response
                 return res.json(response)
             } catch (error) {
                 console.log(error)
                 return res.status(404).json({error: error.message})
             }
         }
+
+        // in case there is a query continent, we are going to return all the countries that match with the search query, the continent query, sorted and paginated.
         else{
             try {
+                // first of all we declare a the response variable and we initialize it with null
                 let response = null
-
+                //if there is no sort query || if sort query is nameDESC, we are going to return the data sorted and paginated
                 if(!sort || sort === 'nameDESC'){
-                  if(!search) response = await Countrie.find({continent: {$in: cArray}}).sort({name: 'asc'}).skip(page * perPage).limit(perPage)
-                  else response = await Countrie.find({continent: {$in: cArray}, name: {$regex: search, $options: 'i'}}).sort({name: 'asc'}).skip(page * perPage).limit(perPage)
+                    // as above, we are going to do almost the same thing, we are going to check if there is search query
+                    // if there isn't a search query, we are going to return the data filtered by continent and sorted and paginated
+                    if(!search) response = await Countrie.find({continent: {$in: cArray}}).sort({name: 'asc'}).skip(page * perPage).limit(perPage)
+                    // if there is a search query, we are going to return the data filtered by continent and in search query, sorted and paginated
+                    else response = await Countrie.find({continent: {$in: cArray}, name: {$regex: search, $options: 'i'}}).sort({name: 'asc'}).skip(page * perPage).limit(perPage)
                 }  
+                // the rest of the code bellow is the same as the previous one, but it response with the type of sort
                 
                 if(sort === 'nameASC'){
                     if(!search) response = await Countrie.find({continent: {$in: cArray}}).sort({name: 'desc'}).skip(page * perPage).limit(perPage)
@@ -231,7 +250,7 @@ const axios = require('axios')
                     if(!search) response = await Countrie.find({continent: {$in: cArray}}).sort({population: 'asc'}).skip(page * perPage).limit(perPage)
                     else response = await Countrie.find({continent: {$in: cArray}, name: {$regex: search, $options: 'i'}}).sort({population: 'asc'}).skip(page * perPage).limit(perPage)
                 }
-               
+                // when the filtering and query is done, we are going to return the response
                 return res.json(response)
             } catch (error) {
                 console.log(error)
